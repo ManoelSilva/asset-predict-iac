@@ -2,15 +2,18 @@ provider "aws" {
   region = "us-east-1"
 }
 
+data "aws_ssm_parameter" "latest_amazon_linux_ami" {
+  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+}
+
 resource "aws_key_pair" "local_key" {
   key_name   = "asset-predict-key"
   public_key = file("~/.ssh/id_rsa.pub")
 }
 
 resource "aws_instance" "asset_predict_host" {
-  ami           = "ami-0c02fb55956c7d316" # Amazon Linux 2 AMI (HVM), SSD Volume Type, update as needed
+  ami           = data.aws_ssm_parameter.latest_amazon_linux_ami.value
   instance_type = "t3.large"
-  # iam_instance_profile = "LabRole" # Uncomment if you want to use an instance profile
   key_name      = aws_key_pair.local_key.key_name
 
   vpc_security_group_ids = [aws_security_group.asset_predict_sg.id]

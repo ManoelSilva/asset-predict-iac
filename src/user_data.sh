@@ -1,33 +1,43 @@
 #!/bin/bash
+# Log all output to a file for troubleshooting
+exec > >(tee /var/log/user_data.log|logger -t user-data -s 2>/dev/console) 2>&1
 set -e
 
-# Update and install system packages
-yum update -y
+# Update and install system packages (Amazon Linux 2023 uses dnf)
+echo "Checking for Amazon Linux 2023 release updates..."
+dnf check-release-update || true
 
-# Install Python 3.12 and pip
-amazon-linux-extras enable python3.8
-yum install -y python3 python3-pip
+echo "Applying Amazon Linux 2023 release update if available..."
+dnf upgrade -y || true
 
-# Install Node.js (for Angular frontend)
-curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
-yum install -y nodejs
+echo "Updating system packages..."
+dnf update -y
+
+echo "Installing Python 3, pip, git, nodejs, docker, unzip, wget..."
+dnf install -y python3 python3-pip git unzip wget
+
+# Install Node.js (for Angular frontend, if needed)
+echo "Installing Node.js..."
+# Amazon Linux 2023 may have nodejs20 available directly
+dnf install -y nodejs
 
 # Install Docker
-yum install -y docker
-groupadd docker || true
+echo "Installing Docker..."
+dnf install -y docker
 usermod -aG docker ec2-user
 systemctl enable docker
 systemctl start docker
 
-# Install Git
-yum install -y git
-
 # Upgrade pip
+echo "Upgrading pip..."
 python3 -m pip install --upgrade pip
 
-# Set up firewall (optional, handled by SG)
-# firewall-cmd --permanent --add-service=http
-# firewall-cmd --permanent --add-service=https
-# firewall-cmd --reload
+# Print installed versions for debugging
+python3 --version
+pip3 --version
+git --version
+docker --version
+node --version || true
+npm --version || true
 
-# Placeholder for project deployment steps
+echo "User data script execution completed successfully."
