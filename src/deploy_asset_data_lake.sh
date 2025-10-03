@@ -17,6 +17,11 @@ if [ -z "$MOTHERDUCK_TOKEN" ]; then
   exit 1
 fi
 
+# Remove existing project directory if it exists
+if [ -d "$APP_DIR" ]; then
+  rm -rf "$APP_DIR"
+fi
+
 # Clone or update the project from git
 if [ ! -d "$APP_DIR/.git" ]; then
   git clone --branch $BRANCH $REPO_URL $APP_DIR
