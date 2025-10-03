@@ -43,6 +43,13 @@ pip install -r $APP_DIR/requirements.txt
 
 deactivate
 
+# Replace PUBLIC_IP in swagger.yaml with the actual public IP
+SWAGGER_FILE=$APP_DIR/src/swagger.yaml
+if [ -f "$SWAGGER_FILE" ]; then
+  EC2_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+  sed -i "s|http://PUBLIC_IP:5002|http://$EC2_IP:5002|g" "$SWAGGER_FILE"
+fi
+
 # Create systemd service
 cat <<EOF > $SERVICE_FILE
 [Unit]
