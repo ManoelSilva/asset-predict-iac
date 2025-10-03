@@ -32,6 +32,9 @@ cp -r $APP_DIR/dist/asset-predict-web/* /usr/share/nginx/html/
 
 # Set permissions for nginx html directory
 chown -R nginx:nginx /usr/share/nginx/html
+chmod -R 755 /usr/share/nginx/html
+# Set SELinux context if SELinux is enabled (safe to run regardless)
+chcon -R -t httpd_sys_content_t /usr/share/nginx/html || true
 
 # Update nginx config to use /usr/share/nginx/html/browser as root
 NGINX_CONF="/etc/nginx/nginx.conf"
