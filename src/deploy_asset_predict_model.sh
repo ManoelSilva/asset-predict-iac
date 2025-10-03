@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# Usage: sudo PUBLIC_IP=your_public_ip_here bash deploy_asset_predict_model.sh
+# Usage: sudo EC2_HOST=your_EC2_HOST_here bash deploy_asset_predict_model.sh
 
 APP_NAME=asset-predict-model
 APP_DIR=/opt/$APP_NAME
@@ -17,9 +17,9 @@ if [ -z "$MOTHERDUCK_TOKEN" ]; then
   exit 1
 fi
 
-# Check for PUBLIC_IP
-if [ -z "$PUBLIC_IP" ]; then
-  echo "Error: PUBLIC_IP environment variable is not set."
+# Check for EC2_HOST
+if [ -z "$EC2_HOST" ]; then
+  echo "Error: EC2_HOST environment variable is not set."
   exit 1
 fi
 
@@ -49,10 +49,10 @@ pip install -r $APP_DIR/requirements.txt
 
 deactivate
 
-# Replace PUBLIC_IP in swagger.yml with the actual public IP
+# Replace PUBLIC_IP in swagger.yml with the actual ec2 host IP
 SWAGGER_FILE=$APP_DIR/src/b3/config/web_api/swagger/swagger.yml
 if [ -f "$SWAGGER_FILE" ]; then
-  sed -i "s|http://PUBLIC_IP:5001|http://$PUBLIC_IP:5001|g" "$SWAGGER_FILE"
+  sed -i "s|http://PUBLIC_IP:5001|http://$EC2_HOST:5001|g" "$SWAGGER_FILE"
 fi
 
 # Create systemd service

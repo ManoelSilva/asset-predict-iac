@@ -43,14 +43,14 @@ pip install -r $APP_DIR/requirements.txt
 
 deactivate
 
-# Replace PUBLIC_IP in swagger.yaml with the value from the PUBLIC_IP environment variable (set by GitHub Actions)
+# Replace PUBLIC_IP in swagger.yml with the actual ec2 host IP
 SWAGGER_FILE=$APP_DIR/src/swagger.yaml
 if [ -f "$SWAGGER_FILE" ]; then
-  if [ -z "$PUBLIC_IP" ]; then
-    echo "ERROR: PUBLIC_IP environment variable is not set."
+  if [ -z "$EC2_HOST" ]; then
+    echo "ERROR: EC2_HOST environment variable is not set."
     exit 1
   fi
-  sed -i "s|http://PUBLIC_IP:5002|http://$PUBLIC_IP:5002|g" "$SWAGGER_FILE"
+  sed -i "s|http://PUBLIC_IP:5002|http://$EC2_HOST:5002|g" "$SWAGGER_FILE"
 fi
 
 # Create systemd service
