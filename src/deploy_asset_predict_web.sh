@@ -41,8 +41,13 @@ chcon -R -t httpd_sys_content_t /usr/share/nginx/html || true
 # Copy nginx config from repo to nginx conf.d directory
 cp /tmp/asset-predict-web-nginx.conf /etc/nginx/conf.d/asset-predict-web.conf
 
-# Reload nginx to apply new config
+# Reload or start nginx to apply new config
 systemctl enable nginx
-nginx -t && systemctl reload nginx
+nginx -t
+if ! systemctl is-active --quiet nginx; then
+  systemctl start nginx
+else
+  systemctl reload nginx
+fi
 
 echo "Asset Predict Web deployed and served via nginx."
