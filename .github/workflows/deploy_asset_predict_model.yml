@@ -22,7 +22,7 @@ jobs:
       - name: Run deploy script on EC2
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} \
-            "sudo MOTHERDUCK_TOKEN='${{ secrets.MOTHERDUCK_TOKEN }}' PUBLIC_IP='${{ secrets.EC2_HOST }}' bash /tmp/deploy_asset_predict_model.sh"
+            "sudo MOTHERDUCK_TOKEN='${{ secrets.MOTHERDUCK_TOKEN }}' EC2_HOST='${{ secrets.EC2_HOST }}' bash /tmp/deploy_asset_predict_model.sh"
 
 # Required secrets:
 # - EC2_SSH_KEY: Private SSH key for ec2-user
