@@ -26,8 +26,10 @@ sudo -u ec2-user npx ng build --configuration production
 # Install nginx if not present
 dnf install -y nginx
 
-# Copy built files to nginx html directory
+# Remove old files from previous deploy
 rm -rf /usr/share/nginx/html/*
+
+# Copy built files to nginx html directory
 cp -r $APP_DIR/dist/asset-predict-web/* /usr/share/nginx/html/
 
 # Set permissions for nginx html directory
@@ -36,13 +38,11 @@ chmod -R 755 /usr/share/nginx/html
 # Set SELinux context if SELinux is enabled (safe to run regardless)
 chcon -R -t httpd_sys_content_t /usr/share/nginx/html || true
 
-# Update nginx config to use /usr/share/nginx/html/browser as root
-NGINX_CONF="/etc/nginx/nginx.conf"
-sed -i 's|root   /usr/share/nginx/html;|root   /usr/share/nginx/html/browser;|g' $NGINX_CONF
-sed -i '/root   \/usr\/share\/nginx\/html\/browser;/a \\n        index  index.html index.htm;\n\n        location / {\n            try_files $uri $uri/ /index.html;\n        }' $NGINX_CONF
+# Copy nginx config from repo to nginx conf.d directory
+cp /Users/ctw04461/Documents/personal/projects/asset-predict-iac/src/asset-predict-web-nginx.conf /etc/nginx/conf.d/asset-predict-web.conf
 
-# Enable and restart nginx
+# Reload nginx to apply new config
 systemctl enable nginx
-systemctl restart nginx
+nginx -t && systemctl reload nginx
 
 echo "Asset Predict Web deployed and served via nginx."
