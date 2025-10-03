@@ -67,7 +67,7 @@ WorkingDirectory=$APP_DIR/src
 Environment="PYTHONUNBUFFERED=1"
 Environment="environment=AWS"
 Environment="MOTHERDUCK_TOKEN=$MOTHERDUCK_TOKEN"
-ExecStart=$VENV_DIR/bin/python3.12 -m b3.service.web_api.b3_model_api
+ExecStart=$VENV_DIR/bin/python3.12 $APP_DIR/src/web_api.py
 Restart=always
 
 [Install]
