@@ -33,6 +33,11 @@ cp -r $APP_DIR/dist/asset-predict-web/* /usr/share/nginx/html/
 # Set permissions for nginx html directory
 chown -R nginx:nginx /usr/share/nginx/html
 
+# Update nginx config to use /usr/share/nginx/html/browser as root
+NGINX_CONF="/etc/nginx/nginx.conf"
+sed -i 's|root   /usr/share/nginx/html;|root   /usr/share/nginx/html/browser;|g' $NGINX_CONF
+sed -i '/root   \/usr\/share\/nginx\/html\/browser;/a \\n        index  index.html index.htm;\n\n        location / {\n            try_files $uri $uri/ /index.html;\n        }' $NGINX_CONF
+
 # Enable and restart nginx
 systemctl enable nginx
 systemctl restart nginx

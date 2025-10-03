@@ -22,10 +22,14 @@ dnf install -y python3.12 python3.12-pip || {
 echo "Installing git, unzip, wget..."
 dnf install -y git unzip wget
 
-# Install Node.js (for Angular frontend, if needed)
-echo "Installing Node.js..."
-# Amazon Linux 2023 may have nodejs20 available directly
+# Install latest stable LTS Node.js (using NodeSource)
+echo "Installing latest stable Node.js (LTS) from NodeSource..."
+curl -fsSL https://rpm.nodesource.com/setup_lts.x | bash -
 dnf install -y nodejs
+
+# Upgrade npm to the latest stable version
+echo "Upgrading npm to the latest stable version..."
+npm install -g npm@latest
 
 # Install Docker
 echo "Installing Docker..."
@@ -40,13 +44,6 @@ if command -v python3.12 &> /dev/null; then
     python3.12 -m pip install --upgrade pip
 else
     python3 -m pip install --upgrade pip
-fi
-
-# Set python3.12 and pip3.12 as default if available
-if command -v python3.12 &> /dev/null; then
-    echo "Setting python3.12 and pip3.12 as default python3 and pip3..."
-    alternatives --set python3 /usr/bin/python3.12 || ln -sf $(command -v python3.12) /usr/bin/python3
-    alternatives --set pip3 /usr/bin/pip3.12 || ln -sf $(command -v pip3.12) /usr/bin/pip3
 fi
 
 # Print installed versions for debugging
