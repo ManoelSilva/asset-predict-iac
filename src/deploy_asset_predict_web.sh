@@ -39,7 +39,7 @@ chmod -R 755 /usr/share/nginx/html
 chcon -R -t httpd_sys_content_t /usr/share/nginx/html || true
 
 # Copy nginx config from repo to nginx conf.d directory
-cp /Users/ctw04461/Documents/personal/projects/asset-predict-iac/src/asset-predict-web-nginx.conf /etc/nginx/conf.d/asset-predict-web.conf
+cp "$(dirname "$0")/asset-predict-web-nginx.conf" /etc/nginx/conf.d/asset-predict-web.conf
 
 # Reload nginx to apply new config
 systemctl enable nginx
