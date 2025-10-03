@@ -11,9 +11,15 @@ resource "aws_key_pair" "local_key" {
   public_key = file("~/.ssh/id_rsa.pub")
 }
 
+resource "aws_iam_instance_profile" "labrole_profile" {
+  name = "labrole-instance-profile"
+  role = "LabRole"
+}
+
 resource "aws_instance" "asset_predict_host" {
   ami           = data.aws_ssm_parameter.latest_amazon_linux_ami.value
   instance_type = "t3.large"
+  iam_instance_profile = aws_iam_instance_profile.labrole_profile.name
   key_name      = aws_key_pair.local_key.key_name
 
   vpc_security_group_ids = [aws_security_group.asset_predict_sg.id]
@@ -51,15 +57,15 @@ resource "aws_security_group" "asset_predict_sg" {
   }
 
   ingress {
-    from_port   = 5002
-    to_port     = 5002
+    from_port   = 5001
+    to_port     = 5001
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port   = 5001
-    to_port     = 5001
+    from_port   = 5002
+    to_port     = 5002
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
