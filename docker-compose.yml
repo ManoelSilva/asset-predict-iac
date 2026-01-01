@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  asset-predict-model:
+    build:
+      context: ../asset-predict-model
+      dockerfile: Dockerfile
+    container_name: asset-predict-model
+    ports:
+      - "5001:5001"
+    environment:
+      - MOTHERDUCK_TOKEN=${MOTHERDUCK_TOKEN}
+      - PYTHONUNBUFFERED=1
+      - ASSET_API_BASE_URL=http://asset-data-lake:5002/asset/
+    volumes:
+      # Mount model files from host to container
+      - ../asset-predict-model/src/models:/app/src/models:ro
+    networks:
+      - asset-predict-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.settimeout(2); result=s.connect_ex(('localhost', 5001)); s.close(); exit(0 if result==0 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  asset-data-lake:
+    build:
+      context: ../asset-data-lake
+      dockerfile: Dockerfile
+    container_name: asset-data-lake
+    ports:
+      - "5002:5002"
+    environment:
+      - MOTHERDUCK_TOKEN=${MOTHERDUCK_TOKEN}
+      - PYTHONUNBUFFERED=1
+    networks:
+      - asset-predict-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5002/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  asset-predict-web:
+    build:
+      context: ../asset-predict-web
+      dockerfile: Dockerfile
+    container_name: asset-predict-web
+    ports:
+      - "80:80"
+    depends_on:
+      - asset-predict-model
+      - asset-data-lake
+    networks:
+      - asset-predict-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  asset-predict-network:
+    driver: bridge
+

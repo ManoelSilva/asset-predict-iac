@@ -8,12 +8,77 @@ This Terraform configuration provisions an AWS EC2 instance to host and serve th
 - [asset-predict-web](../asset-predict-web/README.md) (Angular)
 
 ## Prerequisites
+
+### For AWS Deployment (Terraform)
 - AWS CLI configured with appropriate permissions
 - Terraform >= 1.0.0
 - An existing EC2 Key Pair (for SSH access)
 - IAM Role named `LabRole` with necessary permissions
 
-## Usage
+### For Local Development (Docker Compose)
+- Docker and Docker Compose installed
+- MotherDuck token for database access
+
+## Local Development with Docker Compose
+
+This project includes a `docker-compose.yml` file that allows you to run the entire application stack locally in isolated Docker containers. This is useful for development and testing before deploying to AWS.
+
+### Setup for Local Development
+
+1. **Clone this repository**:
+   ```bash
+   git clone <asset-predict-iac-repo-url>
+   cd asset-predict-iac
+   ```
+
+2. **Clone the dependency projects** at the same level as this directory:
+   ```bash
+   cd ..
+   git clone <asset-predict-model-repo-url> asset-predict-model
+   git clone <asset-data-lake-repo-url> asset-data-lake
+   git clone <asset-predict-web-repo-url> asset-predict-web
+   cd asset-predict-iac
+   ```
+   
+   Your directory structure should look like:
+   ```
+   projetos/
+   ├── asset-predict-iac/
+   │   └── docker-compose.yml
+   ├── asset-predict-model/
+   ├── asset-data-lake/
+   └── asset-predict-web/
+   ```
+
+3. **Create a `.env` file** in the root directory:
+   ```bash
+   echo "MOTHERDUCK_TOKEN=your_motherduck_token_here" > .env
+   ```
+   Replace `your_motherduck_token_here` with your actual MotherDuck token.
+
+4. **Ensure model files are available**: Make sure your `.pt` and `.joblib` model files are in `../asset-predict-model/src/models/`.
+
+5. **Build and start all services**:
+   ```bash
+   docker-compose up -d
+   ```
+
+6. **Access the application**:
+   - Frontend: `http://localhost`
+   - Model API: `http://localhost:5001`
+   - Data Lake API: `http://localhost:5002`
+
+### Docker Compose Commands
+
+- **View logs**: `docker-compose logs -f`
+- **Stop services**: `docker-compose down`
+- **Restart a service**: `docker-compose restart asset-predict-model`
+- **Rebuild after code changes**: `docker-compose up -d --build`
+- **Check service status**: `docker-compose ps`
+
+> **Note**: The dependency project folders (`asset-predict-model`, `asset-data-lake`, `asset-predict-web`) are ignored by git in this repository. Each user should clone them separately at the same level as `asset-predict-iac` directory.
+
+## AWS Deployment with Terraform
 
 1. **Initialize Terraform**
    ```sh
@@ -44,13 +109,21 @@ This Terraform configuration provisions an AWS EC2 instance to host and serve th
    The instance will have Python, Node.js, and Docker installed. Project-specific deployment scripts will be added to automate setup for each project.
 
 ## Files
+
+### Terraform Files
 - `main.tf`: EC2, security group, and IAM role setup
 - `outputs.tf`: Outputs for instance access (public IP and DNS)
 - `user_data.sh`: Bootstraps the instance with required software (Python 3.12, Node.js, Docker, Git)
+
+### Deployment Scripts
 - `deploy_asset_data_lake.sh`: Automates deployment and service setup for asset-data-lake
 - `deploy_asset_predict_model.sh`: Automates deployment and service setup for asset-predict-model
 - `deploy_asset_predict_web.sh`: Automates deployment and service setup for asset-predict-web
 - `asset-predict-web-nginx.conf`: Nginx configuration for serving the Angular frontend
+
+### Docker Compose
+- `docker-compose.yml`: Docker Compose configuration for local development
+- `.env.example`: Example environment variables file (create `.env` from this)
 
 ## Environment Variables Required
 

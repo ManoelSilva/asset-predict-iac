@@ -245,3 +245,9 @@ terraform.rc
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/terraform,visualstudiocode,pycharm,intellij
+
+### Docker ###
+# Docker environment file (may contain sensitive tokens)
+.env
+.env.local
+.env.*.local
