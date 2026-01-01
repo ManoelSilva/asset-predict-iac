@@ -3,9 +3,9 @@
 # Asset Predict Infrastructure (Terraform)
 
 This Terraform configuration provisions an AWS EC2 instance to host and serve the following projects:
-- [asset-data-lake](../asset-data-lake/README.md) (Python/Flask)
-- [asset-predict-model](../asset-predict-model/README.md) (Python/Flask)
-- [asset-predict-web](../asset-predict-web/README.md) (Angular)
+- [asset-data-lake](https://github.com/manoelsilva/asset-data-lake) (Python/Flask)
+- [asset-predict-model](https://github.com/manoelsilva/asset-predict-model) (Python/Flask)
+- [asset-predict-web](https://github.com/manoelsilva/asset-predict-web) (Angular)
 
 ## Prerequisites
 
@@ -34,15 +34,15 @@ This project includes a `docker-compose.yml` file that allows you to run the ent
 2. **Clone the dependency projects** at the same level as this directory:
    ```bash
    cd ..
-   git clone <asset-predict-model-repo-url> asset-predict-model
-   git clone <asset-data-lake-repo-url> asset-data-lake
-   git clone <asset-predict-web-repo-url> asset-predict-web
+   git clone https://github.com/manoelsilva/asset-predict-model.git asset-predict-model
+   git clone https://github.com/manoelsilva/asset-data-lake.git asset-data-lake
+   git clone https://github.com/manoelsilva/asset-predict-web.git asset-predict-web
    cd asset-predict-iac
    ```
    
    Your directory structure should look like:
    ```
-   projetos/
+   projects/
    ├── asset-predict-iac/
    │   └── docker-compose.yml
    ├── asset-predict-model/
