@@ -3,17 +3,82 @@
 # Asset Predict Infrastructure (Terraform)
 
 Esta configuração do Terraform provisiona uma instância AWS EC2 para hospedar e servir os seguintes projetos:
-- [asset-data-lake](../asset-data-lake/README.pt-br.md) (Python/Flask)
-- [asset-predict-model](../asset-predict-model/README.pt-br.md) (Python/Flask)
-- [asset-predict-web](../asset-predict-web/README.pt-br.md) (Angular)
+- [asset-data-lake](https://github.com/manoelsilva/asset-data-lake) (Python/Flask)
+- [asset-predict-model](https://github.com/manoelsilva/asset-predict-model) (Python/Flask)
+- [asset-predict-web](https://github.com/manoelsilva/asset-predict-web) (Angular)
 
 ## Pré-requisitos
+
+### Para Deploy AWS (Terraform)
 - AWS CLI configurado com permissões apropriadas
 - Terraform >= 1.0.0
 - Um EC2 Key Pair existente (para acesso SSH)
 - IAM Role nomeada `LabRole` com as permissões necessárias
 
-## Uso
+### Para Desenvolvimento Local (Docker Compose)
+- Docker e Docker Compose instalados
+- Token do MotherDuck para acesso ao banco de dados
+
+## Desenvolvimento Local com Docker Compose
+
+Este projeto inclui um arquivo `docker-compose.yml` que permite executar toda a stack de aplicação localmente em containers Docker isolados. Isso é útil para desenvolvimento e testes antes de fazer o deploy na AWS.
+
+### Configuração para Desenvolvimento Local
+
+1. **Clone este repositório**:
+   ```bash
+   git clone <asset-predict-iac-repo-url>
+   cd asset-predict-iac
+   ```
+
+2. **Clone os projetos de dependência** no mesmo nível deste diretório:
+   ```bash
+   cd ..
+   git clone https://github.com/manoelsilva/asset-predict-model.git asset-predict-model
+   git clone https://github.com/manoelsilva/asset-data-lake.git asset-data-lake
+   git clone https://github.com/manoelsilva/asset-predict-web.git asset-predict-web
+   cd asset-predict-iac
+   ```
+   
+   A estrutura de diretórios deve ficar assim:
+   ```
+   projects/
+   ├── asset-predict-iac/
+   │   └── docker-compose.yml
+   ├── asset-predict-model/
+   ├── asset-data-lake/
+   └── asset-predict-web/
+   ```
+
+3. **Crie um arquivo `.env`** no diretório raiz:
+   ```bash
+   echo "MOTHERDUCK_TOKEN=seu_token_motherduck_aqui" > .env
+   ```
+   Substitua `seu_token_motherduck_aqui` pelo seu token real do MotherDuck.
+
+4. **Certifique-se de que os arquivos de modelo estão disponíveis**: Certifique-se de que seus arquivos de modelo `.pt` e `.joblib` estão em `../asset-predict-model/src/models/`.
+
+5. **Construa e inicie todos os serviços**:
+   ```bash
+   docker-compose up -d
+   ```
+
+6. **Acesse a aplicação**:
+   - Frontend: `http://localhost`
+   - API do Modelo: `http://localhost:5001`
+   - API do Data Lake: `http://localhost:5002`
+
+### Comandos do Docker Compose
+
+- **Ver logs**: `docker-compose logs -f`
+- **Parar serviços**: `docker-compose down`
+- **Reiniciar um serviço**: `docker-compose restart asset-predict-model`
+- **Reconstruir após mudanças no código**: `docker-compose up -d --build`
+- **Verificar status dos serviços**: `docker-compose ps`
+
+> **Nota**: As pastas dos projetos de dependência (`asset-predict-model`, `asset-data-lake`, `asset-predict-web`) são ignoradas pelo git neste repositório. Cada usuário deve cloná-las separadamente no mesmo nível do diretório `asset-predict-iac`.
+
+## Deploy AWS com Terraform
 
 1. **Inicializar o Terraform**
    ```sh
@@ -44,13 +109,21 @@ Esta configuração do Terraform provisiona uma instância AWS EC2 para hospedar
    A instância terá Python, Node.js e Docker instalados. Scripts de deploy específicos para cada projeto serão adicionados para automatizar a configuração de cada projeto.
 
 ## Arquivos
+
+### Arquivos Terraform
 - `main.tf`: Configuração EC2, security group e IAM role
 - `outputs.tf`: Outputs para acesso à instância (IP público e DNS)
 - `user_data.sh`: Inicializa a instância com software necessário (Python 3.12, Node.js, Docker, Git)
+
+### Scripts de Deploy
 - `deploy_asset_data_lake.sh`: Automatiza deploy e configuração do serviço para asset-data-lake
 - `deploy_asset_predict_model.sh`: Automatiza deploy e configuração do serviço para asset-predict-model
 - `deploy_asset_predict_web.sh`: Automatiza deploy e configuração do serviço para asset-predict-web
 - `asset-predict-web-nginx.conf`: Configuração Nginx para servir o frontend Angular
+
+### Docker Compose
+- `docker-compose.yml`: Configuração Docker Compose para desenvolvimento local
+- `.env.example`: Arquivo de exemplo de variáveis de ambiente (crie `.env` a partir deste)
 
 ## Variáveis de Ambiente Necessárias
 

@@ -1,3 +1,5 @@
+[Leia em português](DOCKER_SETUP.pt-br.md)
+
 # Docker Compose Setup Guide
 
 This guide explains how to set up and run the Asset Predict application stack locally using Docker Compose.
@@ -26,15 +28,15 @@ The `docker-compose.yml` file orchestrates three services:
 2. **Clone the dependency projects** at the same level as this directory:
    ```bash
    cd ..
-   git clone <asset-predict-model-repo-url> asset-predict-model
-   git clone <asset-data-lake-repo-url> asset-data-lake
-   git clone <asset-predict-web-repo-url> asset-predict-web
+   git clone https://github.com/manoelsilva/asset-predict-model.git asset-predict-model
+   git clone https://github.com/manoelsilva/asset-data-lake.git asset-data-lake
+   git clone https://github.com/manoelsilva/asset-predict-web.git asset-predict-web
    cd asset-predict-iac
    ```
 
    Your directory structure should look like:
    ```
-   projetos/
+   projects/
    ├── asset-predict-iac/
    │   └── docker-compose.yml
    ├── asset-predict-model/
@@ -186,8 +188,6 @@ The `asset-predict-model` service needs to communicate with `asset-data-lake` to
 
 ## Notes
 
-- The dependency project folders (`asset-predict-model`, `asset-data-lake`, `asset-predict-web`) are ignored by git in this repository (see `.gitignore`)
-- Each user should clone them separately at the same level as `asset-predict-iac` directory
 - Model files are mounted as read-only volumes, so you can update them without rebuilding containers
 - The `docker-compose.yml` file uses relative paths (`../`) to reference the dependency projects at the same directory level
 
